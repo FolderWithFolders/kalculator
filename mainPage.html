@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Калькулятор</title>
+    <link rel="stylesheet" type="text/css" href="styleMainPage.css">
+    <style>
+        #output {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Калькулятор</h1>
+    <label for="input">Введите число:</label>
+    <input type="text" id="input" name="input">
+    <button onclick="solve()">Решить</button>
+    <p id="output"></p>
+
+    <script>
+        function solve() {
+            var input = document.getElementById('input').value;
+            var output = document.getElementById('output'); 
+
+            var xhr = new XMLHttpRequest(); // Отправляем запрос на сервер с введенным числом и получаем ответ от сервера 
+            xhr.open("POST", "/evaluate", true); 
+            xhr.setRequestHeader("Content-Type", "application/json"); 
+            xhr.send(JSON.stringify({expression: input})); 
+    
+            // Обрабатываем ответ от сервера
+            xhr.onreadystatechange = function() {  
+                if (xhr.readyState == 4 && xhr.status == 200) { 
+                    var result = JSON.parse(xhr.responseText).result; 
+                    output.textContent = 'Результат: ' + result; 
+                }
+            }
+        }
+    </script>
+</body>
+</html>
