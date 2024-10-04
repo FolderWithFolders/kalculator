@@ -44,7 +44,7 @@ func evaluateExpression(expr string) int {
 	// Проходим по каждому символу в выражении
 	for i := 0; i < len(expr); i++ {
 		if expr[i] == ' ' {
-			continue // Игнорируем пробелы
+			continue // Игнорируем пробелы в выражении
 		}
 
 		if expr[i] >= '0' && expr[i] <= '9' { // Проверяем, является ли символ цифрой
