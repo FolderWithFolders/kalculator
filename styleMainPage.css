@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(to right, black, red);
+    background: chocolate
 }
 
 h1 {
@@ -41,6 +41,7 @@ button:hover {
 }
 
 #output {
+    text-align: center;
     margin-top: 20px;
     font-size: 18px;
     font-weight: bold;
