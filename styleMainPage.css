@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background: rgb(128, 96, 74)
+    background: rgb(117 136 179);
 }
 
 h1 {
@@ -25,6 +25,7 @@ input[type="number"] {
 }
 
 button {
+    text-align: center;
     display: block;
     width: 100px;
     padding: 10px;
