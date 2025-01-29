@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net"
 	"net/http"
 )
@@ -14,6 +15,8 @@ func precedence(op rune) int {
 		return 1 // Сложение и вычитание имеют низкий приоритет
 	case '*', '/':
 		return 2 // Умножение и деление имеют высокий приоритет
+	case '^':
+		return 3 // Операция возведения в степень имеет высокий приоритет
 	}
 	return 0 // Если операция не распознана, возвращаем 0
 }
@@ -32,6 +35,9 @@ func applyOperation(a, b int, op rune) int {
 			panic("division by zero") // Обрабатываем деление на ноль
 		}
 		return a / b // Выполняем деление
+	case '^':
+		return int(math.Pow(float64(a), float64(b))) // Выполняем возведение в степень
+
 	}
 	return 0 // Если операция не распознана, возвращаем 0
 }
@@ -74,7 +80,7 @@ func evaluateExpression(expr string) int {
 				values = append(values, applyOperation(val1, val2, op))
 			}
 			ops = ops[:len(ops)-1] // Удаляем открывающую скобку из стека операторов
-		} else { // Если это оператор (например, +, -, *, /)
+		} else if expr[i] == '+' || expr[i] == '-' || expr[i] == '*' || expr[i] == '/' { // Если это оператор (например, +, -, *, /)
 			// Обрабатываем все операции с более высоким или равным приоритетом
 			for len(ops) > 0 && precedence(ops[len(ops)-1]) >= precedence(rune(expr[i])) {
 				val2 := values[len(values)-1]   // Берём верхнее значение из стека значений
@@ -90,21 +96,38 @@ func evaluateExpression(expr string) int {
 				values = append(values, applyOperation(val1, val2, op))
 			}
 			ops = append(ops, rune(expr[i])) // Добавляем текущий оператор в стек операторов
+		} else {
+			//возведение в степень
+			for len(ops) > 0 && ops[len(ops)-1] == '^' {
+				val2 := values[len(values)-1]   // Берём верхнее значение из стека значений
+				values = values[:len(values)-1] // Удаляем его из стека
+
+				val1 := values[len(values)-1]   // Берём следующее значение
+				values = values[:len(values)-1] // Удаляем его из стека
+
+				op := ops[len(ops)-1]  // Берём верхний оператор из стека операторов
+				ops = ops[:len(ops)-1] // Удаляем его из стека
+
+				// Применяем операцию и добавляем результат обратно в стек значений
+				values = append(values, applyOperation(val1, val2, op))
+			}
+			ops = append(ops, rune(expr[i])) // Добавляем текущий оператор в стек операторов
 		}
-	}
 
-	// После завершения прохода по выражению обрабатываем оставшиеся операции
-	for len(ops) > 0 {
-		val2 := values[len(values)-1]   // Берём верхнее значение из стека значений
-		values = values[:len(values)-1] // Удаляем его из стека
+		// После завершения прохода по выражению обрабатываем оставшиеся операции
+		for len(ops) > 0 {
+			val2 := values[len(values)-1]   // Берём верхнее значение из стека значений
+			values = values[:len(values)-1] // Удаляем его из стека
 
-		val1 := values[len(values)-1]   // Берём следующее значение
-		values = values[:len(values)-1] // Удаляем его из стека
+			val1 := values[len(values)-1]   // Берём следующее значение
+			values = values[:len(values)-1] // Удаляем его из стека
 
-		op := ops[len(ops)-1]  // Берём верхний оператор из стека операторов
-		ops = ops[:len(ops)-1] // Удаляем его из стека
-		// Применяем операцию и добавляем результат обратно в стек значений
-		values = append(values, applyOperation(val1, val2, op))
+			op := ops[len(ops)-1]  // Берём верхний оператор из стека операторов
+			ops = ops[:len(ops)-1] // Удаляем его из стека
+			// Применяем операцию и добавляем результат обратно в стек значений
+			values = append(values, applyOperation(val1, val2, op))
+		}
+		ops = append(ops, rune(expr[i])) // Добавляем текущий оператор в стек операторов
 	}
 
 	return values[0] // Возвращаем окончательный результат (единственное значение в стеке)
